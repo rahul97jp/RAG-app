@@ -1,1 +1,1 @@
-RAG application built using LangChain, integrating chat history. Persisted the chat histories in an SQLite database using SQLAlchemy.
+RAG application built using LangChain, integrating chat history. Persisting the chat history in an SQLite database using SQLAlchemy.
