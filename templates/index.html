@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RAG Chat Application</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
+        #chat-history { border: 1px solid #ccc; padding: 10px; height: 300px; overflow-y: auto; margin-bottom: 10px; }
+        #question { width: 70%; padding: 5px; }
+        #session-id { width: 20%; padding: 5px; }
+        button { padding: 5px 10px; }
+        .loader { display: none; border: 4px solid #f3f3f3; border-top: 4px solid #3498db; border-radius: 50%; width: 20px; height: 20px; animation: spin 1s linear infinite; margin-left: 10px; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+    <h1>RAG Chat Application</h1>
+    <div id="chat-history"></div>
+    <input type="text" id="session-id" placeholder="Session ID">
+    <input type="text" id="question" placeholder="Ask a question...">
+    <button id="send-button" onclick="askQuestion()">Send</button>
+    <div class="loader" id="loader"></div>
+
+    <script>
+        function askQuestion() {
+            var sessionId = $('#session-id').val();
+            var question = $('#question').val();
+            if (sessionId && question) {
+                // Disable button and show loader
+                $('#send-button').prop('disabled', true);
+                $('#loader').show();
+
+                $.ajax({
+                    url: '/',
+                    method: 'POST',
+                    data: { session_id: sessionId, question: question },
+                    success: function(response) {
+                        $('#chat-history').append('<p><strong>You:</strong> ' + question + '</p>');
+                        $('#chat-history').append('<p><strong>AI:</strong> ' + response.answer + '</p>');
+                        $('#question').val('');
+                        $('#chat-history').scrollTop($('#chat-history')[0].scrollHeight);
+                    },
+                    error: function() {
+                        alert('An error occurred while processing your request.');
+                    },
+                    complete: function() {
+                        // Re-enable button and hide loader
+                        $('#send-button').prop('disabled', false);
+                        $('#loader').hide();
+                    }
+                });
+            } else {
+                alert('Please enter both a session ID and a question.');
+            }
+        }
+
+        // Allow sending question by pressing Enter key
+        $('#question').keypress(function(e) {
+            if(e.which == 13) {
+                askQuestion();
+            }
+        });
+    </script>
+</body>
+</html>
